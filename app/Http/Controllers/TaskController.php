@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Hash;
 use App\table_user_post;
+use DB;
+use App\like_user;
+use App\comment_user;
 
 use Session;
 
@@ -65,6 +68,11 @@ class TaskController extends Controller
             return response()->view('errors.custom', [], 404);
         }
     }
+    
+    public function logout(){
+        return redirect('/home')->with(Auth::logout());
+
+    }
 
     public function store(Request $request){
         
@@ -98,7 +106,7 @@ class TaskController extends Controller
             'password' => Hash::make($request['password']),
             'bday' => $request['bday'],
             'gender' => $request['gender'],
-            'profilepath' => $intersect['name']
+            'profilepath' => $filename
         ]);
       
         
@@ -109,6 +117,15 @@ class TaskController extends Controller
         $task->update($request->all());
 
         return $task;
+    }
+    public function updatePost(Request $request){
+      
+
+        $table = \DB::table('table_user_posts')->where('post_id', '=', $request->id)->update([
+            'post' => $request['post']
+
+        ]);
+        return $table;
     }
 
     public function delete(Request $request, $id){
@@ -128,7 +145,9 @@ class TaskController extends Controller
         $intersect = $collection->intersect($request->profilepath);
         
         $intersect->all();
-
+    if($intersect['image'] != ""){
+            
+        
         $exploded = explode(',', $intersect['image']);
 
         $decode = base64_decode($exploded[1]);
@@ -137,26 +156,47 @@ class TaskController extends Controller
             $extension = 'jpg';
         else
             $extension = 'png';
-
+        
         $filename = str_random().'.'.$extension;
 
         $path = public_path().'/'.$filename;
 
         file_put_contents($path, $decode);
-        
+    }else{
+        $filename = '';
+    }
         $id = Auth::user()->id;
-
-        return table_user_post::create([
+        Auth::id();
+        
+        return array(table_user_post::create([
             'id' => $id,
             'post' => $request['post'],
-            'path' => $intersect['name']
-        ]);
+            'path' => $filename
+        ]), like_user::create([
+            'like_id' => $id
+        ]));
 
         
     }
 
     public function showPost(){
         $id = Auth::user()->id;
-        return table_user_post::findMany($id);
+        $id_auth = $id;
+        return array(table_user_post::orderBy('created_at', 'desc')->with('user','like_user','comment_user')->get(), json_encode($id_auth));
+        
+    }
+
+    public function likePost(Request $request){
+        $table = \DB::table('like_users')->where('id', '=', $request->id)->update('count_like', '+', 1);  
+        return $table;
+    }
+
+    public function deletePost(Request $request){
+        $post_id =  $request->id;
+        
+        $delete = \DB::table('table_user_posts')->where('post_id', '=', $post_id)->delete();
+        // $delete = table_user_post::findOrFail($post_id);
+
+        
     }
 }

@@ -14,7 +14,7 @@ class CreateTableUserPostsTable extends Migration
     public function up()
     {
         Schema::create('table_user_posts', function (Blueprint $table) {
-         
+            $table->bigIncrements('post_id');
             $table->unsignedbigInteger('id');
             $table->String('post');
             $table->String('path');

@@ -18,7 +18,10 @@ Auth::routes();
 // Route::get('/home', 'TaskController@index');
 Route::get('/home', 'TaskController@showPost');
 Route::post('/home', 'TaskController@storePost');
-
+Route::post('/home/delete', 'TaskController@deletePost');
+Route::post('/home/logout', 'Auth\LoginController@logout')->name('logout');
+Route::post('home/update', 'TaskController@updatePost');
+Route::post('home/like', 'TaskController@likePost');
 Route::get('tasks', 'TaskController@index');
 Route::get('tasks/{id}', 'TaskController@show');
 Route::post('tasks', 'TaskController@store');
