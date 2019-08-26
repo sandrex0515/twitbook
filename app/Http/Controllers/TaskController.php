@@ -168,13 +168,19 @@ class TaskController extends Controller
         $id = Auth::user()->id;
         Auth::id();
         
-        return array(table_user_post::create([
-            'id' => $id,
-            'post' => $request['post'],
-            'path' => $filename
-        ]), like_user::create([
-            'like_id' => $id
-        ]));
+    
+        $lastId = new table_user_post();
+        $lastId->id = $id;
+        $lastId->post = $request['post'];
+        $lastId->path = $filename;
+        $lastId->save();
+        
+        $last = DB::getPdo()->lastInsertId();;
+
+        return  
+         like_user::create([
+            'like_id' => $last
+        ]);
 
         
     }
@@ -182,12 +188,14 @@ class TaskController extends Controller
     public function showPost(){
         $id = Auth::user()->id;
         $id_auth = $id;
-        return array(table_user_post::orderBy('created_at', 'desc')->with('user','like_user','comment_user')->get(), json_encode($id_auth));
+        return array(table_user_post::orderBy('created_at', 'desc')->with('user','like_user','comment_user')->get(), json_encode($id_auth),
+                        like_user::orderBy('created_at', 'desc')->get()
+    );
         
     }
 
     public function likePost(Request $request){
-        $table = \DB::table('like_users')->where('id', '=', $request->id)->update('count_like', '+', 1);  
+        $table = \DB::table('like_users')->where('like_id', '=', $request->id)->update(['count_like' =>  DB::raw('count_like + 1'), 'status' => 1]);  
         return $table;
     }
 

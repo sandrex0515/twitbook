@@ -2105,11 +2105,47 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       todos: [],
+      liketodos: [],
       auth_id: '',
       id: '',
       names: '',
@@ -2137,9 +2173,16 @@ __webpack_require__.r(__webpack_exports__);
         method: 'GET',
         url: '/api/home'
       }).then(function (result) {
-        console.log(result.data);
+        // console.log(result.data)
         _this.todos = result.data[0];
         _this.auth_id = result.data[1];
+        _this.liketodos = result.data[2];
+        _this.todos.count_like = _this.liketodos; // console.log(this.todos);
+
+        for (var i = 0; i < _this.liketodos.length; i++) {
+          _this.todos.count_like = _this.liketodos[i];
+          _this.todos.count_like.count_like = _this.liketodos[i].count_like;
+        }
       }, function (error) {
         console.error(error);
       });
@@ -2210,10 +2253,14 @@ __webpack_require__.r(__webpack_exports__);
         });
       }
     },
-    likeTask: function likeTask(id) {
+    likeTask: function likeTask(post_id) {
+      var _this6 = this;
+
       axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('api/home/like', {
-        id: id
-      }).then(function (res) {})["catch"](function (er) {
+        id: post_id
+      }).then(function (res) {
+        _this6.getTask();
+      })["catch"](function (er) {
         alert('Server Error');
       });
     }
@@ -34715,7 +34762,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.imgCircle{\n  height:340px;\n  width:310px;\n  border:none;\n  outline:none;\n}\n.user img, h5:hover{\n  color:blue;\n  cursor:pointer\n}\n\n", ""]);
+exports.push([module.i, "\n.imgCircle{\n    height:340px;\n    width:310px;\n    border:none;\n    outline:none;\n}\n.user img, h5:hover{\n    color:blue;\n    cursor:pointer\n}\n@media only screen and (max-width: 991px) {\n.imgRes {\n      text-align: center;\n}\n.imgRes img{\n    width:200px;\n    height: 200px;\n}\n}\n.imgRes h5{\n  margin-bottom:60px;\n}\n\n", ""]);
 
 // exports
 
@@ -67397,48 +67444,53 @@ var render = function() {
           _c("hr"),
           _vm._v(" "),
           _c("div", { staticClass: "row" }, [
-            _c("div", { staticClass: "col-lg-2 user" }, [
+            _c("div", { staticClass: "col-lg-2 user imgRes" }, [
               _c("img", {
                 staticClass: "img-thumbnail rounded-circle",
                 attrs: { src: todos.user.profilepath }
               })
             ]),
             _vm._v(" "),
-            _c("div", { staticClass: "col-lg-10 user" }, [
+            _c("div", { staticClass: "col-lg-10 user imgRes" }, [
               _c("br"),
               _vm._v(" "),
-              _c("h5", [_vm._v(_vm._s(todos.user.name))]),
-              _vm._v(" "),
-              todos.id == _vm.auth_id
-                ? _c(
-                    "h3",
-                    {
-                      staticClass: "text-right",
-                      staticStyle: { cursor: "pointer" }
-                    },
-                    [
-                      _c("i", {
-                        staticClass: "fas fa-user-edit text-success",
-                        attrs: { title: "Edit" },
-                        on: { click: _vm.editPost }
-                      }),
-                      _vm._v(" "),
-                      _c("i", {
-                        staticClass: "fas fa-trash text-danger",
-                        attrs: { title: "Delete" },
-                        on: {
-                          click: function($event) {
-                            return _vm.deleteTask(todos.post_id)
-                          }
-                        }
-                      })
-                    ]
-                  )
-                : _vm._e()
+              _c("h5", [
+                _vm._v(_vm._s(todos.user.name) + "\n\n\n                  "),
+                todos.id == _vm.auth_id
+                  ? _c(
+                      "h2",
+                      {
+                        staticClass: "text-right",
+                        staticStyle: { cursor: "pointer" }
+                      },
+                      [
+                        _c("button", { staticClass: "btn btn-white" }, [
+                          _c("i", {
+                            staticClass: "fas fa-user-edit text-success",
+                            attrs: { title: "Edit" },
+                            on: { click: _vm.editPost }
+                          })
+                        ]),
+                        _vm._v(" "),
+                        _c("button", { staticClass: "btn btn-white" }, [
+                          _c("i", {
+                            staticClass: "fas fa-trash text-danger",
+                            attrs: { title: "Delete" },
+                            on: {
+                              click: function($event) {
+                                return _vm.deleteTask(todos.post_id)
+                              }
+                            }
+                          })
+                        ])
+                      ]
+                    )
+                  : _vm._e()
+              ])
             ])
           ]),
           _vm._v(" "),
-          _c("div", { staticClass: "row" }, [
+          _c("div", { staticClass: "row imgRes" }, [
             _c("div", { staticClass: "col-lg-2" }),
             _vm._v(" "),
             _c(
@@ -67532,13 +67584,13 @@ var render = function() {
             _c(
               "div",
               {
-                staticClass: "col-lg-8 text-center",
+                staticClass: "col-lg-8 text-center imgRes1",
                 staticStyle: { cursor: "pointer" }
               },
               [
                 todos.path
                   ? _c("img", {
-                      staticClass: "img-thumbnail",
+                      staticClass: "img-thumbnail ",
                       staticStyle: { "margin-bottom": "10px" },
                       attrs: { src: todos.path }
                     })
@@ -67548,19 +67600,27 @@ var render = function() {
                   "button",
                   {
                     staticClass: "btn btn-white rounded-circle",
-                    attrs: {
-                      type: "button",
-                      "data-toggle": "modal",
-                      "data-target": "#exampleModal"
-                    },
+                    attrs: { type: "button" },
                     on: {
                       click: function($event) {
-                        return _vm.likeTask(todos.like_user.id)
+                        return _vm.likeTask(todos.post_id)
                       }
                     }
                   },
                   [
-                    _c("i", { staticClass: "fas fa-heart fa-2x text-white " }),
+                    todos.like_user.status == 1
+                      ? _c("i", {
+                          staticClass:
+                            "fas fa-heart fa-2x text-white text-danger"
+                        })
+                      : _vm._e(),
+                    _vm._v(" "),
+                    todos.like_user.status == 0
+                      ? _c("i", {
+                          staticClass:
+                            "fas fa-heart fa-2x text-white text-danger"
+                        })
+                      : _vm._e(),
                     _vm._v(" "),
                     _c("p", [_vm._v(_vm._s(todos.like_user.count_like))])
                   ]
@@ -67594,7 +67654,69 @@ var render = function() {
         ])
       }),
       _vm._v(" "),
-      _vm._m(1)
+      _c(
+        "div",
+        {
+          staticClass: "modal fade",
+          attrs: {
+            id: "exampleModal",
+            tabindex: "-1",
+            role: "dialog",
+            "aria-labelledby": "exampleModalLabel",
+            "aria-hidden": "true"
+          }
+        },
+        [
+          _c(
+            "div",
+            { staticClass: "modal-dialog", attrs: { role: "document" } },
+            [
+              _c("div", { staticClass: "modal-content" }, [
+                _vm._m(1),
+                _vm._v(" "),
+                _vm._m(2),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-footer" }, [
+                  _c("textarea", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.post,
+                        expression: "post"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: {
+                      id: "exampleFormControlTextarea1",
+                      placeholder: "Comment...",
+                      rows: "3"
+                    },
+                    domProps: { value: _vm.post },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.post = $event.target.value
+                      }
+                    }
+                  }),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-primary",
+                      attrs: { type: "submit" }
+                    },
+                    [_vm._v("Say")]
+                  )
+                ])
+              ])
+            ]
+          )
+        ]
+      )
     ],
     2
   )
@@ -67619,74 +67741,50 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c(
-      "div",
-      {
-        staticClass: "modal fade",
-        attrs: {
-          id: "exampleModal",
-          tabindex: "-1",
-          role: "dialog",
-          "aria-labelledby": "exampleModalLabel",
-          "aria-hidden": "true"
-        }
-      },
-      [
-        _c(
-          "div",
-          { staticClass: "modal-dialog", attrs: { role: "document" } },
-          [
-            _c("div", { staticClass: "modal-content" }, [
-              _c("div", { staticClass: "modal-header" }, [
-                _c(
-                  "button",
-                  {
-                    staticClass: "close",
-                    attrs: {
-                      type: "button",
-                      "data-dismiss": "modal",
-                      "aria-label": "Close"
-                    }
-                  },
-                  [
-                    _c("span", { attrs: { "aria-hidden": "true" } }, [
-                      _vm._v("×")
-                    ])
-                  ]
-                )
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "modal-body" }, [
-                _c("div", { staticClass: "row" }, [
-                  _c("div", { staticClass: "col-lg-2" }, [
-                    _c("img", {
-                      staticClass: "img-thumbnail rounded-circle",
-                      attrs: {
-                        src:
-                          "https://static1.squarespace.com/static/5918773d46c3c45c5c7ff4d5/t/5d0291391e38b30001a76196/1566004246555/?format=1500w"
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-lg-8" }, [
-                    _vm._v("\n               sandrex cabrales\n              ")
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "row" }, [
-                  _c("div", { staticClass: "col-lg-2" }),
-                  _vm._v(" "),
-                  _c("div", { staticClass: "col-lg-8" }, [
-                    _vm._v("\n              i think sooo\n              "),
-                    _c("hr")
-                  ])
-                ])
-              ])
-            ])
-          ]
-        )
-      ]
-    )
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-body" }, [
+      _c("div", { staticClass: "row" }, [
+        _c("div", { staticClass: "col-lg-2" }, [
+          _c("img", {
+            staticClass: "img-thumbnail rounded-circle",
+            attrs: { src: "1U49D92VSX3pXHNZ.jpg" }
+          })
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "col-lg-8" }, [
+          _vm._v("\n                Sandrex Cabrales\n              ")
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "row" }, [
+        _c("div", { staticClass: "col-lg-2" }),
+        _vm._v(" "),
+        _c("div", { staticClass: "col-lg-8" }, [
+          _vm._v(
+            "\n                Sorry i run out of time to do this :(\n              "
+          ),
+          _c("hr")
+        ])
+      ])
+    ])
   }
 ]
 render._withStripped = true
